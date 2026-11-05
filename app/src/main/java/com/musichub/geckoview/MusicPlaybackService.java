@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
@@ -24,6 +25,8 @@ public class MusicPlaybackService extends Service {
     private MediaSessionCompat mediaSession;
     private String title = "MusicHub";
     private String artist = "";
+    private String album = "";
+    private Bitmap artwork;
     private boolean playing;
 
     public interface CommandListener { void play(); void pause(); void next(); void previous(); }
@@ -49,14 +52,32 @@ public class MusicPlaybackService extends Service {
         else startForeground(NOTIFICATION_ID, buildNotification());
     }
 
-    public void updateMetadata(String t, String a) {
+    public void updateMetadata(String t, String a, String al) {
         title = t == null || t.isEmpty() ? "MusicHub" : t;
         artist = a == null ? "" : a;
-        mediaSession.setMetadata(new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist).build());
+        album = al == null ? "" : al;
+        publishMetadata();
         refresh();
     }
+
+    public void updateArtwork(Bitmap image) {
+        artwork = image;
+        publishMetadata();
+        refresh();
+    }
+
+    private void publishMetadata() {
+        MediaMetadataCompat.Builder metadata = new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album);
+        if (artwork != null) {
+            metadata.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, artwork)
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, artwork);
+        }
+        mediaSession.setMetadata(metadata.build());
+    }
+
     public void updatePlaybackState(boolean value) {
         playing = value;
         long actions = PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE |
@@ -67,12 +88,13 @@ public class MusicPlaybackService extends Service {
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1f).build());
         refresh();
     }
+
     private Notification buildNotification() {
         Intent open = new Intent(this, MainActivity.class);
         PendingIntent content = PendingIntent.getActivity(this, 0, open,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         int icon = playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play;
-        return new NotificationCompat.Builder(this, CHANNEL)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL)
                 .setSmallIcon(android.R.drawable.ic_media_play).setContentTitle(title).setContentText(artist)
                 .setContentIntent(content).setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setOnlyAlertOnce(true)
                 .addAction(android.R.drawable.ic_media_previous, "Previous",
@@ -82,8 +104,11 @@ public class MusicPlaybackService extends Service {
                 .addAction(android.R.drawable.ic_media_next, "Next",
                         MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_NEXT))
                 .setStyle(new MediaStyle().setMediaSession(mediaSession.getSessionToken())
-                        .setShowActionsInCompactView(0, 1, 2)).build();
+                        .setShowActionsInCompactView(0, 1, 2));
+        if (artwork != null) builder.setLargeIcon(artwork);
+        return builder.build();
     }
+
     private void refresh() {
         NotificationManager nm = getSystemService(NotificationManager.class);
         if (nm != null) nm.notify(NOTIFICATION_ID, buildNotification());
