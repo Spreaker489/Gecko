@@ -11,14 +11,14 @@ android {
         versionCode 3
         versionName '1.2.1'
     }
-    // Build a device-specific APK so each phone gets only its own
-    // GeckoView native libraries instead of all CPU architectures.
+    // Produce ABI-specific APKs for smaller installs, plus a universal APK
+    // as a compatibility fallback. Use the universal APK if device ABI is uncertain.
     splits {
         abi {
             enable true
             reset()
             include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-            universalApk false
+            universalApk true
         }
     }
     compileOptions {
