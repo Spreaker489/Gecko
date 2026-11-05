@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
                     .headerFilter(GeckoSession.HEADER_FILTER_UNRESTRICTED_UNSAFE)
                     .additionalHeaders(Collections.singletonMap("skip_zrok_interstitial", "1")));
         }
-        ((GeckoviewPlaceholder) null);
         GeckoView view = findViewById(R.id.geckoview);
         view.setSession(session);
         MusicPlaybackService.setCommandListener(new MusicPlaybackService.CommandListener() {
