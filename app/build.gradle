@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.application'
+}
+android {
+    namespace 'com.musichub.geckoview'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.musichub.geckoview'
+        minSdk 24
+        targetSdk 34
+        versionCode 3
+        versionName '1.2.1'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+configurations.configureEach {
+    resolutionStrategy.force 'androidx.core:core:1.12.0'
+}
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.media:media:1.7.0'
+    implementation 'org.mozilla.geckoview:geckoview:143.0.20250908174027'
+}
