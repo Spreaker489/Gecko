@@ -10,6 +10,24 @@ MusicHub este o aplicație Android care oferă acces la playerul web MusicHub î
 
 **Developer: marius_489_spk**
 
+## Despre aplicație (About)
+
+MusicHub 1.2.1 este o aplicație Android care aduce playerul MusicHub într-o aplicație dedicată, folosind motorul Mozilla GeckoView. Scopul ei este să ofere acces simplu la muzică și să integreze redarea cu funcțiile media ale sistemului Android.
+
+Aplicația include comenzi pentru piesa anterioară, redare/pauză și piesa următoare, precum și afișarea informațiilor despre melodie și a copertei albumului în notificare și pe ecranul de blocare, atunci când playerul și dispozitivul permit acest lucru.
+
+MusicHub este pregătită pentru Android 7.0 și versiuni ulterioare (minSdk 24), inclusiv Android 8.0+. Pentru distribuție sunt prevăzute:
+- **Classic – Universal APK:** pachet universal pentru instalare directă.
+- **Slim – ABI APK:** pachete mai mici, separate după arhitectura procesorului; trebuie ales fișierul compatibil cu dispozitivul.
+- **Google Play – AAB:** pachet pentru publicare prin Google Play, nu pentru instalare directă.
+
+Variantele Slim și AAB sunt opțiuni de distribuție care trebuie verificate pe dispozitive reale înainte de a fi considerate stabile. Nu este garantată o anumită dimensiune finală a fișierului sau a instalării.
+
+**Versiune documentată:** 1.2.1  
+**Dezvoltator:** marius_489_spk
+
+---
+
 ## Caracteristici
 
 - **Player web integrat:** încarcă MusicHub în aplicația Android prin GeckoView.
@@ -88,6 +106,24 @@ Nu este specificată încă o licență pentru acest repository. Până la adău
 MusicHub is an Android application that provides access to the MusicHub web player through a dedicated app interface powered by **Mozilla GeckoView**. The project aims to preserve the music playback experience and Android media controls while providing a foundation for more efficient distribution across different devices.
 
 **Developer: marius_489_spk**
+
+## About the App
+
+MusicHub 1.2.1 brings the MusicHub web player into a dedicated Android application powered by Mozilla GeckoView. Its goal is to provide convenient access to music and integrate playback with Android media features.
+
+The app includes previous-track, play/pause, and next-track controls, together with track information and album artwork in the media notification and on the lock screen whenever supported by the player and device.
+
+MusicHub is configured for Android 7.0 and later (minSdk 24), including Android 8.0+. The project provides these distribution options:
+- **Classic – Universal APK:** a universal package for direct installation.
+- **Slim – ABI APKs:** smaller packages built for specific CPU architectures; choose the package matching the device.
+- **Google Play – AAB:** a bundle for Google Play distribution, not for direct installation.
+
+The Slim and AAB distribution options must be validated on real devices before being considered stable. No specific final download or installation size is guaranteed.
+
+**Documented version:** 1.2.1  
+**Developer:** marius_489_spk
+
+---
 
 ## Features
 
