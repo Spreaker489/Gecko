@@ -1,4 +1,4 @@
-# MusicHub Android
+# MusicHub V1.2.1 Gecko 
 
 Clean Android wrapper for the MusicHub web player using Mozilla GeckoView.
 
