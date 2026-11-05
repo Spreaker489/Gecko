@@ -1,4 +1,4 @@
-name: Build MusicHub APK and AAB
+name: MusicHub 1.2.1 - Release Builds
 on:
   push:
     branches: [ "main", "musichub-safe-optimization" ]
@@ -19,41 +19,60 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.4'
-      - name: Install uploaded MusicHub launcher icon
+      - name: Install MusicHub launcher icon
         run: |
           mkdir -p app/src/main/res/drawable-nodpi
           cp icon.png app/src/main/res/drawable-nodpi/ic_launcher.png
-          file app/src/main/res/drawable-nodpi/ic_launcher.png
       - name: Build debug APK (CI verification)
         run: gradle assembleDebug --no-daemon --stacktrace
       - name: Build Release APK variants
         run: gradle assembleRelease --no-daemon --stacktrace
       - name: Build Release Android App Bundle
         run: gradle bundleRelease --no-daemon --stacktrace
-      - name: Report output sizes
+      - name: Prepare clearly named release files
         run: |
-          echo "Classic universal Release APK:"
-          du -h app/build/outputs/apk/release/*universal*.apk
-          echo "Slim ABI-specific Release APKs:"
-          du -h app/build/outputs/apk/release/*-v8a-*.apk app/build/outputs/apk/release/*-v7a-*.apk
-          echo "Release AAB:"
-          du -h app/build/outputs/bundle/release/*.aab
-      - uses: actions/upload-artifact@v4
+          mkdir -p release-files
+          cp app/build/outputs/apk/release/*universal*.apk release-files/MusicHub-1.2.1-Classic-Universal.apk
+          cp app/build/outputs/apk/release/*-arm64-v8a-*.apk release-files/MusicHub-1.2.1-Slim-arm64-v8a.apk
+          cp app/build/outputs/apk/release/*-armeabi-v7a-*.apk release-files/MusicHub-1.2.1-Slim-armeabi-v7a.apk
+          cp app/build/outputs/apk/release/*-x86-*.apk release-files/MusicHub-1.2.1-Slim-x86.apk
+          cp app/build/outputs/apk/release/*-x86_64-*.apk release-files/MusicHub-1.2.1-Slim-x86_64.apk
+          cp app/build/outputs/bundle/release/*.aab release-files/MusicHub-1.2.1-Google-Play.aab
+          echo "Release file sizes:"
+          du -h release-files/*
+      - name: Upload Classic universal APK
+        uses: actions/upload-artifact@v4
         with:
-          name: musichub-1.2.1-classic-universal-apk
-          path: app/build/outputs/apk/release/*universal*.apk
+          name: MusicHub-1.2.1-Classic-Universal-APK
+          path: release-files/MusicHub-1.2.1-Classic-Universal.apk
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - name: Upload Slim ARM64 APK
+        uses: actions/upload-artifact@v4
         with:
-          name: musichub-1.2.1-slim-abi-apks
-          path: |
-            app/build/outputs/apk/release/*-arm64-v8a-*.apk
-            app/build/outputs/apk/release/*-armeabi-v7a-*.apk
-            app/build/outputs/apk/release/*-x86-*.apk
-            app/build/outputs/apk/release/*-x86_64-*.apk
+          name: MusicHub-1.2.1-Slim-arm64-v8a-APK
+          path: release-files/MusicHub-1.2.1-Slim-arm64-v8a.apk
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - name: Upload Slim ARMv7 APK
+        uses: actions/upload-artifact@v4
         with:
-          name: musichub-1.2.1-release-aab
-          path: app/build/outputs/bundle/release/*.aab
+          name: MusicHub-1.2.1-Slim-armeabi-v7a-APK
+          path: release-files/MusicHub-1.2.1-Slim-armeabi-v7a.apk
+          if-no-files-found: error
+      - name: Upload Slim x86 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicHub-1.2.1-Slim-x86-APK
+          path: release-files/MusicHub-1.2.1-Slim-x86.apk
+          if-no-files-found: error
+      - name: Upload Slim x86_64 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicHub-1.2.1-Slim-x86_64-APK
+          path: release-files/MusicHub-1.2.1-Slim-x86_64.apk
+          if-no-files-found: error
+      - name: Upload Google Play AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicHub-1.2.1-Google-Play-AAB
+          path: release-files/MusicHub-1.2.1-Google-Play.aab
           if-no-files-found: error
