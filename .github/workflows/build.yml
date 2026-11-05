@@ -1,6 +1,8 @@
-name: Build MusicHub APK
+name: Build MusicHub APK and AAB
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 permissions:
@@ -24,8 +26,21 @@ jobs:
           file app/src/main/res/drawable-nodpi/ic_launcher.png
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
+      - name: Build release Android App Bundle
+        run: gradle bundleRelease --no-daemon --stacktrace
+      - name: Report output sizes
+        run: |
+          echo "Debug APK:"
+          du -h app/build/outputs/apk/debug/*.apk
+          echo "Release AAB:"
+          du -h app/build/outputs/bundle/release/*.aab
       - uses: actions/upload-artifact@v4
         with:
-          name: musichub-rebuild-debug
+          name: musichub-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: musichub-release-aab
+          path: app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
