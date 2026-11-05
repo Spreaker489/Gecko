@@ -1,0 +1,92 @@
+name: Publish MusicHub 1.2.1 Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: "Successful build workflow run ID"
+        required: true
+        default: "41964975656"
+      release_tag:
+        description: "Release tag"
+        required: true
+        default: "v1.2.1"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get source build commit
+        id: build
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = Number(context.payload.inputs.build_run_id);
+            const run = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId
+            });
+            if (run.status !== 'completed' || run.conclusion !== 'success') {
+              core.setFailed('The selected build run is not completed successfully.');
+              return;
+            }
+            core.setOutput('sha', run.head_sha);
+
+      - name: Download all six build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.build_run_id }}
+          pattern: MusicHub-1.2.1-*
+          path: release-files
+          merge-multiple: true
+
+      - name: Verify release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Downloaded files:"
+          find release-files -maxdepth 2 -type f -printf '%f\n' | sort
+          count=$(find release-files -maxdepth 2 -type f | wc -l)
+          if [ "$count" -ne 6 ]; then
+            echo "Expected exactly 6 release files, found $count."
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.release_tag }}
+          BUILD_SHA: ${{ steps.build.outputs.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<'NOTES'
+          ## Testare și compatibilitate
+
+          - **Classic Universal APK (~700 MB):** testat pe dispozitiv real; redarea audio și funcțiile principale au fost verificate.
+          - **Slim APK (ARM64, ARMv7, x86, x86_64):** compilate cu succes, dar netestate pe dispozitive reale.
+          - **Google Play AAB:** compilat cu succes, dar netestat prin instalare din Google Play.
+
+          **Atenție:** Variantele Slim și AAB sunt furnizate experimental până la finalizarea testelor de compatibilitate și redare audio. Nu este garantată încă funcționarea identică cu versiunea Classic.
+
+          ## Testing and Compatibility
+
+          - **Classic Universal APK (~700 MB):** tested on a physical device; audio playback and core features verified.
+          - **Slim APKs (ARM64, ARMv7, x86, x86_64):** successfully built, but not yet tested on physical devices.
+          - **Google Play AAB:** successfully built, but not yet tested through Google Play installation.
+
+          **Note:** Slim and AAB builds are experimental until device compatibility and audio playback testing is complete. Identical behavior to the Classic version is not yet guaranteed.
+          NOTES
+
+          gh release create "$TAG" release-files/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$BUILD_SHA" \
+            --title "MusicHub 1.2.1" \
+            --notes-file release-notes.md
