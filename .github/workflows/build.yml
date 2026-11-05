@@ -1,7 +1,7 @@
 name: Build MusicHub APK and AAB
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "musichub-safe-optimization" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
