@@ -49,7 +49,19 @@ public class MainActivity extends AppCompatActivity {
                                                  @NonNull MediaSession.Metadata metadata) {
                     activeMedia = media;
                     MusicPlaybackService svc = MusicPlaybackService.getInstance();
-                    if (svc != null) svc.updateMetadata(metadata.title, metadata.artist);
+                    if (svc != null) {
+                        svc.updateMetadata(metadata.title, metadata.artist, metadata.album);
+                        if (metadata.artwork != null) {
+                            metadata.artwork.getBitmap(512).accept(
+                                    bitmap -> {
+                                        MusicPlaybackService current = MusicPlaybackService.getInstance();
+                                        if (current != null) current.updateArtwork(bitmap);
+                                    },
+                                    error -> android.util.Log.w("MusicHub", "Could not load track artwork", error));
+                        } else {
+                            svc.updateArtwork(null);
+                        }
+                    }
                 }
                 @Override public void onPlay(@NonNull GeckoSession s, @NonNull MediaSession media) {
                     activeMedia = media;
