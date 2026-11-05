@@ -60,7 +60,7 @@ Fișierele rezultate sunt generate în directoarele standard Gradle din `app/bui
 - **AAB:** format de publicare pentru Google Play. Google Play poate genera și livra componentele potrivite configurației dispozitivului, inclusiv arhitecturii procesorului.
 - **AAB nu se instalează direct** prin atingere, precum un APK; pentru testare directă se folosește APK-ul sau un pachet generat din AAB.
 
-Workflow-ul GitHub Actions este configurat să compileze APK-ul de depanare și AAB-ul de lansare și să le publice ca artefacte ale execuției workflow-ului.
+Workflow-ul GitHub Actions compilează APK-ul de depanare pentru verificări, APK-ul universal Release (varianta Classic), APK-urile Release separate pe arhitecturi (variante Slim) și AAB-ul Release. Fiecare variantă este publicată separat ca artefact al execuției workflow-ului. APK-urile Slim trebuie instalate numai pe dispozitivele cu arhitectura corespunzătoare.
 
 ## Redare în fundal și testare
 
@@ -139,7 +139,7 @@ Build outputs are generated in the standard Gradle directories under `app/build/
 - **AAB:** a publishing format for Google Play. Google Play can generate and deliver device-specific components, including those matching the device's CPU architecture.
 - **An AAB cannot be installed directly** by tapping it like an APK. For direct device testing, use an APK or a package generated from the AAB.
 
-The GitHub Actions workflow is configured to build the debug APK and release AAB and publish them as workflow artifacts.
+The GitHub Actions workflow builds a debug APK for CI verification, a universal Release APK (Classic), architecture-specific Release APKs (Slim), and the Release AAB. Each variant is published as a separate workflow artifact. Slim APKs must only be installed on devices with the matching CPU architecture.
 
 ## Background playback and testing
 
