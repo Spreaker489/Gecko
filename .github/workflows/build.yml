@@ -24,23 +24,36 @@ jobs:
           mkdir -p app/src/main/res/drawable-nodpi
           cp icon.png app/src/main/res/drawable-nodpi/ic_launcher.png
           file app/src/main/res/drawable-nodpi/ic_launcher.png
-      - name: Build debug APK
+      - name: Build debug APK (CI verification)
         run: gradle assembleDebug --no-daemon --stacktrace
-      - name: Build release Android App Bundle
+      - name: Build Release APK variants
+        run: gradle assembleRelease --no-daemon --stacktrace
+      - name: Build Release Android App Bundle
         run: gradle bundleRelease --no-daemon --stacktrace
       - name: Report output sizes
         run: |
-          echo "Debug APK:"
-          du -h app/build/outputs/apk/debug/*.apk
+          echo "Classic universal Release APK:"
+          du -h app/build/outputs/apk/release/*universal*.apk
+          echo "Slim ABI-specific Release APKs:"
+          du -h app/build/outputs/apk/release/*-v8a-*.apk app/build/outputs/apk/release/*-v7a-*.apk
           echo "Release AAB:"
           du -h app/build/outputs/bundle/release/*.aab
       - uses: actions/upload-artifact@v4
         with:
-          name: musichub-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: musichub-1.2.1-classic-universal-apk
+          path: app/build/outputs/apk/release/*universal*.apk
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
-          name: musichub-release-aab
+          name: musichub-1.2.1-slim-abi-apks
+          path: |
+            app/build/outputs/apk/release/*-arm64-v8a-*.apk
+            app/build/outputs/apk/release/*-armeabi-v7a-*.apk
+            app/build/outputs/apk/release/*-x86-*.apk
+            app/build/outputs/apk/release/*-x86_64-*.apk
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: musichub-1.2.1-release-aab
           path: app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
